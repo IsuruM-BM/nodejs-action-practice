@@ -1,0 +1,34 @@
+name: Node.js CI
+
+on:
+  push:
+    branches:
+      - main          # ✅ Run on 'main' branch
+      - 'feature/*'   # ✅ Run on 'feature/*' branches
+    paths:
+      - 'src/**'      # ✅ Only run if 'src/' files change
+      - '!README.md'  # ❌ Exclude changes to README.md from triggering workflow
+  pull_request:
+    branches:
+      - main          # ✅ Trigger on PR to 'main' branch
+    paths:
+      - 'src/**'      # ✅ Trigger if 'src/' files change
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm test
