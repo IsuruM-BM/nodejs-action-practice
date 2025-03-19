@@ -15,20 +15,37 @@ on:
       - 'src/**'      # ✅ Trigger if 'src/' files change
 
 jobs:
-  test:
+  triage:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - name: Set up GitHub CLI
+        run: |
+          curl -s https://cli.github.com/install.sh | bash
+          gh auth login --with-token < ${GH_TOKEN}
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '14'
+      - name: "Add label and comment"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GitHub token is automatically provided
+          PR: ${{ github.event.pull_request.html_url }}
+        run: |
+          gh pr edit $PR --add-label 'invalid'
+          gh pr comment $PR --body 'This change is not allowed. Please review the contributing guidelines.'
+    
+# jobs:
+#   test:
+#     runs-on: ubuntu-latest
 
-      - name: Install dependencies
-        run: npm install
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v2
 
-      - name: Run tests
-        run: npm test
+#       - name: Set up Node.js
+#         uses: actions/setup-node@v2
+#         with:
+#           node-version: '14'
+
+#       - name: Install dependencies
+#         run: npm install
+
+#       - name: Run tests
+#         run: npm test
